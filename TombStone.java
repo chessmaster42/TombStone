@@ -7,8 +7,13 @@ import java.util.List;
 import TombStone.client.ClientProxy;
 
 import net.minecraft.block.Block;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandManager;
+import net.minecraft.command.ServerCommandManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ModLoader;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
@@ -25,15 +30,15 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="TombStone", name="TombStone", version="0.2.0")
+@Mod(modid="TombStone", name="TombStone", version="0.3.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class TombStone {
 	public final static int tombStoneBlockId = 3000;
 	
 	public static TombStoneBlock tombStoneBlock = new TombStoneBlock(tombStoneBlockId);
 	
-	public static List<String> tombOwnerList = new ArrayList<String>();
-	public static List<String> tombTextList = new ArrayList<String>();
+	//Keeps track of the existing tombs
+	public static List<TombStoneTileEntity> tombList = new ArrayList<TombStoneTileEntity>();
 	
 	// The instance of your mod that Forge uses.
 	@Instance("TombStone")
@@ -80,6 +85,11 @@ public class TombStone {
 	
 	@PostInit
 	public void postInit(FMLPostInitializationEvent event) {
-	        // Stub Method
+		//Register the chat commands
+		if(event.getSide().isServer())
+		{
+			ServerCommandManager manager = (ServerCommandManager) ModLoader.getMinecraftServerInstance().getCommandManager();
+			manager.registerCommand(new ChatHandler());
+		}
 	}
 }

@@ -10,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet130UpdateSign;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
 
@@ -20,21 +19,24 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	
 	//NBT tag(s)
 	private String owner = "Nobody";
-	private String deathText = "Nobody died";
-	private boolean isCrafted = false;
+	private String deathText = "Nobody died\n Died Never";
+	private boolean isCrafted = true;
 	
 	public TombStoneTileEntity(){
 		//A tombstone holds as much as a double-wide chest (54+)
 		inv = new ItemStack[54];
+		
+		TombStone.instance.tombList.add(this);
 	}
 	
-	public TombStoneTileEntity(String newOwner, String newDeathText)
+	public TombStoneTileEntity(String newOwner, String newDeathText, boolean newIsCrafted)
 	{
 		//A tombstone holds as much as a double-wide chest (54+)
 		inv = new ItemStack[54];
 		
 		this.owner = newOwner;
 		this.deathText = newDeathText;
+		this.isCrafted = newIsCrafted;
 	}
 	
 	///////////////////////////////////////

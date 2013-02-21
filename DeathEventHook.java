@@ -3,7 +3,9 @@ package TombStone;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.SideOnly;
 import cpw.mods.fml.relauncher.Side;
 
@@ -35,6 +37,9 @@ public class DeathEventHook {
 		ArrayList<EntityItem> drops = event.drops;
 		World world = deadPlayer.worldObj;
 		
+		//DEBUG//
+		//FMLLog.log(Level.WARNING, "[TombStone] onEntityDeath(): " + attackSource.getDeathMessage(deadPlayer));
+		
 		//Calculate the spot to put the tombstone
 		//TODO - Make this more intelligent
 		int tombX = (int) Math.floor(deadPlayer.posX);
@@ -44,13 +49,8 @@ public class DeathEventHook {
 		String dateOfDeath = world.getCurrentDate().get(Calendar.MONTH) + "/" + world.getCurrentDate().get(Calendar.DAY_OF_MONTH) + "/" + world.getCurrentDate().get(Calendar.YEAR);
 		String deathMessage = attackSource.getDeathMessage(deadPlayer) + " here\n Died " + dateOfDeath;
 		
-		TombStone.instance.tombOwnerList.add(deadPlayer.getEntityName());
-		TombStone.instance.tombTextList.add(deathMessage);
-		
-		int index = TombStone.instance.tombOwnerList.size();
-		
 		//Place the tombstone
-		world.setBlockAndMetadataWithUpdate(tombX, tombY, tombZ, TombStone.instance.tombStoneBlockId, index, true);
+		world.setBlockAndMetadataWithUpdate(tombX, tombY, tombZ, TombStone.instance.tombStoneBlockId, 0, true);
 		TombStoneTileEntity blockTileEntity = (TombStoneTileEntity) world.getBlockTileEntity(tombX, tombY, tombZ);
 		
 		//Move all items from the list to the tombstone inventory
@@ -59,6 +59,10 @@ public class DeathEventHook {
 			ItemStack playerItem = drops.get(i).func_92014_d();
 			blockTileEntity.setInventorySlotContents(i, playerItem);
 		}
+		//Set the other meta-data for the tile entity
+		blockTileEntity.setOwner(deadPlayer.getEntityName());
+		blockTileEntity.setDeathText(deathMessage);
+		blockTileEntity.setIsCrafted(false);
 		
 		event.setCanceled(true);
 	}

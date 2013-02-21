@@ -34,7 +34,7 @@ public class TombStoneRenderer extends TileEntitySpecialRenderer
 		
 		//Render the death text
 		FontRenderer var17 = this.getFontRenderer();
-		float var12 = 0.008F; //0.016666668F
+		float var12 = 0.007F; //0.016666668F
 		GL11.glTranslatef(0.0F, 0.0F, 0.1375F);
 		GL11.glScalef(var12, -var12, var12);
 		GL11.glNormal3f(0.0F, 0.0F, -1.0F * var12);

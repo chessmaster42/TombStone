@@ -1,6 +1,9 @@
 package TombStone;
 
 import java.util.Random;
+import java.util.logging.Level;
+
+import cpw.mods.fml.common.FMLLog;
 
 import TombStone.client.ClientProxy;
 
@@ -8,23 +11,29 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TombStoneBlock extends BlockContainer {
 	
 	private int quantityDropped = 0;
+	private boolean explosionRecover = false;
+	private TombStoneTileEntity tempEntity;
 
 	public TombStoneBlock (int id) {
 		super(id, Material.rock);
 		setHardness(2.0F);
-		setResistance(500.0F);	//Set well above an normal material so that it's immune to explosions
+		setResistance(5000.0F);	//Set well above an normal material so that it's immune to explosions
 		setStepSound(Block.soundStoneFootstep);
 		setBlockName("tombStoneBlock");
 		setCreativeTab(CreativeTabs.tabBlock);
@@ -57,20 +66,36 @@ public class TombStoneBlock extends BlockContainer {
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		dropItems(world, x, y, z);
 		
-		//TombStoneTileEntity tileEntity = (TombStoneTileEntity) world.getBlockTileEntity(x, y, z);
-		//if(tileEntity.isCrafted())
-		//	quantityDropped = 1;
+		TombStoneTileEntity tileEntity = (TombStoneTileEntity) world.getBlockTileEntity(x, y, z);
+		if(tileEntity.isCrafted())
+		{
+			//TODO - Do something
+			quantityDropped = 1;
+		}
 			
 		super.breakBlock(world, x, y, z, par5, par6);
+	}
+	
+	@Override
+	public void harvestBlock(World par1World, EntityPlayer par2EntityPlayer, int par3, int par4, int par5, int par6)
+	{
+		super.harvestBlock(par1World, par2EntityPlayer, par3, par4, par5, par6);
+
+		//Reset the drop quantity		
+		if(quantityDropped == 1)
+			quantityDropped = 0;
 	}
 
 	@Override
     public int quantityDropped(Random par1Random)
     {
-        return 0;
+        return quantityDropped;
     }
 	
 	private void dropItems(World world, int x, int y, int z){
+		if(explosionRecover)
+			return;
+		
 		Random rand = new Random();
 		
 		//Capture the TombStoneTileEntity based on the position of the block
@@ -119,12 +144,7 @@ public class TombStoneBlock extends BlockContainer {
 	}
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
-		if(metadata > 0 && metadata <= TombStone.instance.tombOwnerList.size())
-		{
-			return new TombStoneTileEntity((String) TombStone.instance.tombOwnerList.get(metadata-1), (String) TombStone.instance.tombTextList.get(metadata-1));
-		} else {
-			return new TombStoneTileEntity();
-		}
+		return new TombStoneTileEntity();
 	}
 	
 	@Override
@@ -151,5 +171,48 @@ public class TombStoneBlock extends BlockContainer {
     {
         return false;
     }
+    
+    public boolean canDropFromExplosion(Explosion par1Explosion)
+    {
+		//DEBUG//
+		FMLLog.log(Level.WARNING, "[TombStone] TombStoneBlock.canDropFromExplosion(): " + par1Explosion.exploder.getEntityName());
+		
+		explosionRecover = true;
 
+        return true;
+    }
+    
+    public void dropBlockAsItemWithChance(World par1World, int par2, int par3, int par4, int par5, float par6, int par7)
+    {
+    	super.dropBlockAsItemWithChance(par1World, par2, par3, par4, par5, par6, par7);
+    	
+    	//If we're trying to recover from an explosion, backup the tile entity
+    	if(explosionRecover)
+    		tempEntity = (TombStoneTileEntity) par1World.getBlockTileEntity(par2, par3, par4);    	
+    }
+    
+    public void onBlockDestroyedByExplosion(World par1World, int par2, int par3, int par4)
+    {
+		//DEBUG//
+		FMLLog.log(Level.WARNING, "[TombStone] TombStoneBlock.onBlockDestroyedByExplosion(): " + par2 + "," + par3 + "," + par4);
+   	
+		//We get here because the tombstone is placed between doExplosionA() and doExplosionB() because that's when the player dies
+		//This creates a problem because doExplosionA() is the one that checks the explosion resistance for blocks ...
+		//Ergo the location where the tombstone is about to exist has already been marked for demolition
+		
+		//If destroyed by explosion place it right back
+		par1World.setBlockAndMetadataWithUpdate(par2, par3, par4, TombStone.instance.tombStoneBlockId, 0, true);
+		TombStoneTileEntity blockTileEntity = (TombStoneTileEntity) par1World.getBlockTileEntity(par2, par3, par4);
+		blockTileEntity.setOwner(tempEntity.getOwner());
+		blockTileEntity.setDeathText(tempEntity.getDeathText());
+		blockTileEntity.setIsCrafted(tempEntity.isCrafted());
+		for(int i=0; i<tempEntity.getSizeInventory(); i++)
+		{
+			ItemStack playerItem = tempEntity.getStackInSlot(i);
+			blockTileEntity.setInventorySlotContents(i, playerItem);
+		}
+
+		tempEntity = null;
+		explosionRecover = false;
+    }
 }
