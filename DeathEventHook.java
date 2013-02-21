@@ -1,4 +1,4 @@
-package tombStone;
+package TombStone;
 
 import java.util.ArrayList;
 

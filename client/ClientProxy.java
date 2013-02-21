@@ -1,10 +1,11 @@
-package tombStone.client;
+package TombStone.client;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import net.minecraftforge.client.MinecraftForgeClient;
-import tombStone.CommonProxy;
-import tombStone.TombStoneRenderer;
-import tombStone.TombStoneTileEntity;
+
+import TombStone.CommonProxy;
+import TombStone.TombStoneRenderer;
+import TombStone.TombStoneTileEntity;
 
 public class ClientProxy extends CommonProxy {
         

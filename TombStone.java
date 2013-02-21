@@ -1,10 +1,11 @@
-package tombStone;
+package TombStone;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import tombStone.client.ClientProxy;
+import TombStone.client.ClientProxy;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

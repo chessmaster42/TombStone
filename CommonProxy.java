@@ -1,4 +1,4 @@
-package tombStone;
+package TombStone;
 
 public class CommonProxy {
     public static String ITEMS_PNG = "/tombStone/items.png";

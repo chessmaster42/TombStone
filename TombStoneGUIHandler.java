@@ -1,4 +1,4 @@
-package tombStone;
+package TombStone;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

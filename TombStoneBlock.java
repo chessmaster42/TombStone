@@ -1,8 +1,8 @@
-package tombStone;
+package TombStone;
 
 import java.util.Random;
 
-import tombStone.client.ClientProxy;
+import TombStone.client.ClientProxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
