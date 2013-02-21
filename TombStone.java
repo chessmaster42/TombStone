@@ -20,17 +20,19 @@ import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="TombStone", name="TombStone", version="0.3.0")
+@Mod(modid="TombStone", name="TombStone", version="0.4.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class TombStone {
 	public final static int tombStoneBlockId = 3000;
@@ -85,11 +87,12 @@ public class TombStone {
 	
 	@PostInit
 	public void postInit(FMLPostInitializationEvent event) {
-		//Register the chat commands
-		if(event.getSide().isServer())
-		{
-			ServerCommandManager manager = (ServerCommandManager) ModLoader.getMinecraftServerInstance().getCommandManager();
-			manager.registerCommand(new ChatHandler());
-		}
+		// Stub Method
+	}
+	
+	@ServerStarting
+	public void onServerStarting(FMLServerStartingEvent event)
+	{
+		event.registerServerCommand(new ChatHandler());
 	}
 }

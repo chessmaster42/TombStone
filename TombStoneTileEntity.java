@@ -21,12 +21,12 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	private String owner = "Nobody";
 	private String deathText = "Nobody died\n Died Never";
 	private boolean isCrafted = true;
+	private boolean isAddedToTombList = false;
 	
 	public TombStoneTileEntity(){
 		//A tombstone holds as much as a double-wide chest (54+)
 		inv = new ItemStack[54];
 		
-		TombStone.instance.tombList.add(this);
 	}
 	
 	public TombStoneTileEntity(String newOwner, String newDeathText, boolean newIsCrafted)
@@ -37,6 +37,13 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 		this.owner = newOwner;
 		this.deathText = newDeathText;
 		this.isCrafted = newIsCrafted;
+	}
+	
+	public void finalize() throws Throwable
+	{
+		super.finalize();
+		
+		TombStone.instance.tombList.remove(this);
 	}
 	
 	///////////////////////////////////////
@@ -185,6 +192,19 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
     public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt)
     {
 		readFromNBT(pkt.customParam1);
+		
+		boolean foundDuplicate = false;
+		for(int i=0; i<TombStone.instance.tombList.size(); i++)
+		{
+			TombStoneTileEntity item = TombStone.instance.tombList.get(i);
+			if(item.xCoord == this.xCoord && item.yCoord == this.yCoord && item.zCoord == this.zCoord)
+			{
+				foundDuplicate = true;
+			}
+		}
+		
+		if(!isAddedToTombList && !foundDuplicate)
+			TombStone.instance.tombList.add(this);
     }
 	
 	@Override
@@ -193,7 +213,18 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
         NBTTagCompound nbtData = new NBTTagCompound();
         this.writeToNBT(nbtData);
         
-		//FMLLog.log(Level.WARNING, "getDescriptionPacket()");
+		boolean foundDuplicate = false;
+		for(int i=0; i<TombStone.instance.tombList.size(); i++)
+		{
+			TombStoneTileEntity item = TombStone.instance.tombList.get(i);
+			if(item.xCoord == this.xCoord && item.yCoord == this.yCoord && item.zCoord == this.zCoord)
+			{
+				foundDuplicate = true;
+			}
+		}
+		
+		if(!isAddedToTombList && !foundDuplicate)
+			TombStone.instance.tombList.add(this);
         
         return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 0, nbtData);
     }

@@ -74,6 +74,16 @@ public class TombStoneBlock extends BlockContainer {
 		}
 			
 		super.breakBlock(world, x, y, z, par5, par6);
+		
+		for(int i=0; i<TombStone.instance.tombList.size(); i++)
+		{
+			TombStoneTileEntity item = TombStone.instance.tombList.get(i);
+			if(item.xCoord == x && item.yCoord == y && item.zCoord == z)
+			{
+				TombStone.instance.tombList.remove(i);
+				break;
+			}
+		}
 	}
 	
 	@Override
