@@ -25,7 +25,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="TombStone", name="TombStone", version="0.0.1")
+@Mod(modid="TombStone", name="TombStone", version="0.2.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class TombStone {
 	public final static int tombStoneBlockId = 3000;
@@ -40,7 +40,7 @@ public class TombStone {
 	public static TombStone instance;
 	
 	// Says where the client and server 'proxy' code is loaded.
-	@SidedProxy(clientSide="tombStone.client.ClientProxy", serverSide="tombStone.CommonProxy")
+	@SidedProxy(clientSide="TombStone.client.ClientProxy", serverSide="TombStone.CommonProxy")
 	public static CommonProxy proxy;
 	
 	@PreInit
@@ -64,7 +64,7 @@ public class TombStone {
 		MinecraftForge.EVENT_BUS.register(new DeathEventHook());
 		
 		//Register the tombstone tile entity
-		GameRegistry.registerTileEntity(TombStoneTileEntity.class, "tombStoneContainer");
+		GameRegistry.registerTileEntity(TombStoneTileEntity.class, "tombStoneTileEntity");
 
 		//Register the tombstone gui
 		NetworkRegistry.instance().registerGuiHandler(this, new TombStoneGUIHandler());

@@ -18,11 +18,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TombStoneBlock extends BlockContainer {
+	
+	private int quantityDropped = 0;
 
 	public TombStoneBlock (int id) {
 		super(id, Material.rock);
 		setHardness(2.0F);
-		setResistance(50.0F);
+		setResistance(500.0F);	//Set well above an normal material so that it's immune to explosions
 		setStepSound(Block.soundStoneFootstep);
 		setBlockName("tombStoneBlock");
 		setCreativeTab(CreativeTabs.tabBlock);
@@ -54,15 +56,19 @@ public class TombStoneBlock extends BlockContainer {
 	@Override
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		dropItems(world, x, y, z);
+		
+		//TombStoneTileEntity tileEntity = (TombStoneTileEntity) world.getBlockTileEntity(x, y, z);
+		//if(tileEntity.isCrafted())
+		//	quantityDropped = 1;
+			
 		super.breakBlock(world, x, y, z, par5, par6);
 	}
-	
+
 	@Override
-    public int idDropped(int par1, Random par2Random, int par3)
+    public int quantityDropped(Random par1Random)
     {
         return 0;
     }
-
 	
 	private void dropItems(World world, int x, int y, int z){
 		Random rand = new Random();

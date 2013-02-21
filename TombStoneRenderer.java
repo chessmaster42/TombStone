@@ -16,7 +16,6 @@ import net.minecraft.tileentity.TileEntity;
 public class TombStoneRenderer extends TileEntitySpecialRenderer
 {
 	private TombStoneModel tombModel = new TombStoneModel();
-	public static TombStoneRenderer tombRenderer;
 	
 	public void renderTombStoneTileEntity(TombStoneTileEntity tileEntity, double par2, double par4, double par6, float par8)
 	{
@@ -26,9 +25,9 @@ public class TombStoneRenderer extends TileEntitySpecialRenderer
         GL11.glPushMatrix();
         GL11.glScalef(1.0F, 1.0F, 1.0F);
 		
-        this.bindTextureByName("/tombStone/tombstone.png");
+        this.bindTextureByName("/TombStone/tombstone.png");
 		this.tombModel.renderBase();
-        this.bindTextureByName("/tombStone/tombstone2.png");
+        this.bindTextureByName("/TombStone/tombstone2.png");
 		this.tombModel.renderHeadstone();
 		
 		GL11.glPopMatrix();
@@ -42,7 +41,7 @@ public class TombStoneRenderer extends TileEntitySpecialRenderer
 		GL11.glDepthMask(false);
 		
 		//Draw the player name
-		var17.drawString(tileEntity.getOwner(), -var17.getStringWidth(tileEntity.getOwner()) / 2, -10, 0, false);
+		//var17.drawString(tileEntity.getOwner(), -var17.getStringWidth(tileEntity.getOwner()) / 2, -10, 0, false);
 
 		//Draw the death message
 		StringTokenizer tok = new StringTokenizer(tileEntity.getDeathText(), " ");
@@ -61,14 +60,13 @@ public class TombStoneRenderer extends TileEntitySpecialRenderer
 		String[] splitString = output.toString().split("\n");
 		for(int i=0; i<splitString.length; i++)
 		{
-			var17.drawString(splitString[i], -var17.getStringWidth(splitString[i]) / 2, i * 10, 0, false);
+			var17.drawString(splitString[i], -var17.getStringWidth(splitString[i]) / 2, (i * 10) - 25, 0, false);
 		}
 		GL11.glDepthMask(true);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);		
 		GL11.glPopMatrix();
 	}
 	
-	@Override
 	public void renderTileEntityAt(TileEntity par1TileEntity, double par2, double par4, double par6, float par8)
 	{
 		this.renderTombStoneTileEntity((TombStoneTileEntity)par1TileEntity, par2, par4, par6, par8);

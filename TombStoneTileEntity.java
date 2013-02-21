@@ -1,10 +1,14 @@
 package TombStone;
 
+import java.util.logging.Level;
+
+import cpw.mods.fml.common.FMLLog;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet130UpdateSign;
 import net.minecraft.network.packet.Packet132TileEntityData;
@@ -15,8 +19,9 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	private ItemStack[] inv;
 	
 	//NBT tag(s)
-	private String owner = "None";
-	private String deathText = "None";
+	private String owner = "Nobody";
+	private String deathText = "Nobody died";
+	private boolean isCrafted = false;
 	
 	public TombStoneTileEntity(){
 		//A tombstone holds as much as a double-wide chest (54+)
@@ -31,6 +36,18 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 		this.owner = newOwner;
 		this.deathText = newDeathText;
 	}
+	
+	///////////////////////////////////////
+	
+	public boolean isCrafted()
+	{
+		return this.isCrafted;
+	}
+	
+	public void setIsCrafted(boolean newIsCrafted)
+	{
+		this.isCrafted = newIsCrafted;
+	}	
 	
 	public String getOwner()
 	{
@@ -51,6 +68,8 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	{
 		this.deathText = newDeathText;
 	}
+	
+	///////////////////////////////////////
 	
 	@Override
 	public int getSizeInventory() {
@@ -116,8 +135,11 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	public void readFromNBT(NBTTagCompound tagCompound) {
 		super.readFromNBT(tagCompound);
 		
-		this.owner = tagCompound.getString("owner");
-		this.deathText = tagCompound.getString("deathText");
+		owner = tagCompound.getString("owner");
+		deathText = tagCompound.getString("deathText");
+		isCrafted = tagCompound.getBoolean("isCrafted");
+		
+		//FMLLog.log(Level.WARNING, "Loaded Tombstone: owner=%s, deathText=%s, isCrafted=%b", owner, deathText, isCrafted);
 	    
 		NBTTagList tagList = tagCompound.getTagList("Inventory");
 		for (int i = 0; i < tagList.tagCount(); i++) {
@@ -135,7 +157,10 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 		
 		tagCompound.setString("owner", owner);
 		tagCompound.setString("deathText", deathText);
+		tagCompound.setBoolean("isCrafted", isCrafted);
 		                
+		//FMLLog.log(Level.WARNING, "Saved Tombstone: owner=%s, deathText=%s, isCrafted=%b", owner, deathText, isCrafted);
+
 		NBTTagList itemList = new NBTTagList();
 		for (int i = 0; i < inv.length; i++) {
 			ItemStack stack = inv[i];
@@ -155,10 +180,19 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
+    public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt)
+    {
+		readFromNBT(pkt.customParam1);
+    }
+	
+	@Override
 	public Packet getDescriptionPacket()
     {
         NBTTagCompound nbtData = new NBTTagCompound();
         this.writeToNBT(nbtData);
+        
+		//FMLLog.log(Level.WARNING, "getDescriptionPacket()");
+        
         return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 0, nbtData);
     }
 }
