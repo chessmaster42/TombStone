@@ -50,13 +50,13 @@ public class DeathEventHook {
 		String deathMessage = attackSource.getDeathMessage(deadPlayer) + " here\n Died " + dateOfDeath;
 		
 		//Place the tombstone
-		world.setBlockAndMetadataWithUpdate(tombX, tombY, tombZ, TombStone.instance.tombStoneBlockId, 0, true);
+		world.setBlock(tombX, tombY, tombZ, TombStone.instance.tombStoneBlockId, 0, 1 | 2);
 		TombStoneTileEntity blockTileEntity = (TombStoneTileEntity) world.getBlockTileEntity(tombX, tombY, tombZ);
 		
 		//Move all items from the list to the tombstone inventory
 		for(int i=0; i<drops.size(); i++)
 		{
-			ItemStack playerItem = drops.get(i).func_92014_d();
+			ItemStack playerItem = drops.get(i).getEntityItem();
 			blockTileEntity.setInventorySlotContents(i, playerItem);
 		}
 		//Set the other meta-data for the tile entity

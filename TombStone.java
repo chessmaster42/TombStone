@@ -1,3 +1,7 @@
+/**
+ * 2013.06.17 - Update for Minecraft 1.5.2 and MinecraftFortge 7.8.1.737 by 
+ * Cyanobacterium (Minecraft user Synechocystis)
+ */
 package TombStone;
 
 import java.util.ArrayList;
@@ -31,13 +35,14 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import net.minecraftforge.common.Configuration;
 
-@Mod(modid="TombStone", name="TombStone", version="0.4.0")
+@Mod(modid="TombStone", name="TombStone", version="0.5.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class TombStone {
-	public final static int tombStoneBlockId = 3000;
+	public static int tombStoneBlockId;
 	
-	public static TombStoneBlock tombStoneBlock = new TombStoneBlock(tombStoneBlockId);
+	public static TombStoneBlock tombStoneBlock;
 	
 	//Keeps track of the existing tombs
 	public static List<TombStoneTileEntity> tombList = new ArrayList<TombStoneTileEntity>();
@@ -53,6 +58,11 @@ public class TombStone {
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
 		// Stub Method
+		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+		config.load();
+		tombStoneBlockId = config.getBlock("RandomBlock", 3000).getInt();
+		tombStoneBlock = new TombStoneBlock(tombStoneBlockId);
+		config.save();
 	}
 	
 	@Init
