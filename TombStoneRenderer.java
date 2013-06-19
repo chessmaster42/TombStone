@@ -25,9 +25,9 @@ public class TombStoneRenderer extends TileEntitySpecialRenderer
         GL11.glPushMatrix();
         GL11.glScalef(1.0F, 1.0F, 1.0F);
 		
-        this.bindTextureByName("/TombStone/tombstone.png");
+        this.bindTextureByName("/mods/TombStone/textures/tombstone.png");
 		this.tombModel.renderBase();
-        this.bindTextureByName("/TombStone/tombstone2.png");
+        this.bindTextureByName("/mods/TombStone/textures/tombstone2.png");
 		this.tombModel.renderHeadstone();
 		
 		GL11.glPopMatrix();

@@ -228,4 +228,18 @@ public class TombStoneTileEntity extends TileEntity implements IInventory {
         
         return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 0, nbtData);
     }
+
+	@Override
+	public boolean isInvNameLocalized() {
+		return true; // return false to look-up localized name from language pack
+	}
+
+	/**
+     * DOC: Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
+     */
+	@Override
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		return false; // don't allow items to go in (only out)
+		//return true; // no special restrictions
+	}
 }

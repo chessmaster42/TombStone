@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import cpw.mods.fml.common.FMLLog;
 
 import TombStone.client.ClientProxy;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
@@ -20,12 +22,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class TombStoneBlock extends BlockContainer {
-	
+	Icon[] icons;
 	private int quantityDropped = 0;
 	private boolean explosionRecover = false;
 	private TombStoneTileEntity tempEntity;
@@ -35,26 +38,33 @@ public class TombStoneBlock extends BlockContainer {
 		setHardness(2.0F);
 		setResistance(5000.0F);	//Set well above an normal material so that it's immune to explosions
 		setStepSound(Block.soundStoneFootstep);
-		setBlockName("tombStoneBlock");
+		setUnlocalizedName("Tombstone Block");
 		setCreativeTab(CreativeTabs.tabBlock);
 	}
 	
 	@Override
-	public int getBlockTextureFromSide(int side)
+	@SideOnly(Side.CLIENT)
+	public Icon getIcon(int side, int metadata)
 	{
 		//We use textures 0-5 for this block
-		return side;
+		return icons[side];
 	}
 	
+
+	
 	@Override
-	public String getTextureFile () {
-		return CommonProxy.BLOCK_PNG;
+	public void registerIcons(net.minecraft.client.renderer.texture.IconRegister iconRegister){
+		icons = new Icon[6];
+		for(int i = 0; i < icons.length; i++){
+			iconRegister.registerIcon("TombStone:block"+i); // assumed to be .png and in [src]/mods/[mod ID]/blocks/
+		}
+		
 	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int idk, float what, float these, float are) {
 		TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-		if (tileEntity == null || player.isSneaking()) {
+		if (tileEntity == null ) { // isSneaking check no longer valid (now part of default Minecraft behavior
 			return false;
 		}
 		
@@ -135,7 +145,8 @@ public class TombStoneBlock extends BlockContainer {
 				
 				//Copy any NBT tags associated with the item
 				if (item.hasTagCompound()) {
-					entityItem.func_92014_d().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
+					// func_92014_d() appears to be getEntityItem()
+					entityItem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
 				}
 				
 				//Assign the velocity
@@ -153,7 +164,7 @@ public class TombStoneBlock extends BlockContainer {
 		}
 	}
 	@Override
-	public TileEntity createNewTileEntity(World world, int metadata) {
+	public TileEntity createTileEntity(World world, int metadata) {
 		return new TombStoneTileEntity();
 	}
 	
@@ -211,7 +222,7 @@ public class TombStoneBlock extends BlockContainer {
 		//Ergo the location where the tombstone is about to exist has already been marked for demolition
 		
 		//If destroyed by explosion place it right back
-		par1World.setBlockAndMetadataWithUpdate(par2, par3, par4, TombStone.instance.tombStoneBlockId, 0, true);
+		par1World.setBlock(par2, par3, par4, TombStone.instance.tombStoneBlockId, 0, 1 | 2);
 		TombStoneTileEntity blockTileEntity = (TombStoneTileEntity) par1World.getBlockTileEntity(par2, par3, par4);
 		blockTileEntity.setOwner(tempEntity.getOwner());
 		blockTileEntity.setDeathText(tempEntity.getDeathText());
