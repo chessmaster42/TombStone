@@ -212,7 +212,7 @@ public class TombStoneBlock extends BlockContainer {
     		tempEntity = (TombStoneTileEntity) par1World.getBlockTileEntity(par2, par3, par4);    	
     }
     
-    public void onBlockDestroyedByExplosion(World par1World, int par2, int par3, int par4)
+    public void onBlockDestroyedByExplosion(World par1World, int par2, int par3, int par4, Explosion expl)
     {
 		//DEBUG//
 		FMLLog.log(Level.WARNING, "[TombStone] TombStoneBlock.onBlockDestroyedByExplosion(): " + par2 + "," + par3 + "," + par4);
